@@ -1,3 +1,35 @@
+/*function sort(a){
+	let minIndex = 0;
+    let maxIndex = 0;
+    let st = 0;
+    let ind = 0;
+	for(st = 0;st<a.length-1-st;st++){
+		for(let i=st;i<a.length-1-st;i++){
+			if(a[i]>a[minIndex]){
+				minIndex = st;
+			}
+			if(a[i]<a[maxIndex]){
+				maxIndex = st;
+			}
+		}
+		let temp = a[maxIndex];
+		a[maxIndex] = a[st];
+		a[st] = temp;
+
+		let d = a.length-1-st;
+		temp = a[minIndex];
+		a[minIndex] = a[d];
+		a[d] = temp;
+	}
+	return a;
+}
+
+let a = sort([1,2,3,1,3,6,1,5,9,6,3]);
+console.log(a);
+
+*/
+
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -5,8 +37,11 @@ const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const MIN_SIZE = 10;
 const MAX_SIZE = 100;
+const DEFAULT_COLOR = "black";
 
-let TICK_RATE = 10; 
+let ind = 0,st = 0;
+
+let TICK_RATE = 50;
 
 let arr = [];
 let intervalId = 1;
@@ -46,52 +81,121 @@ function clear(){
 }
 
 function draw(arr){
-	
 	clear();
-	
 	let size = arr.length;
 	let width = WIDTH/size;
 	let	height = HEIGHT/size;
 	
-	ctx.font = "30px Arial";
-	
+	ctx.fillStyle = DEFAULT_COLOR;
 	for(let i=0;i<size;i++){
-		ctx.fillStyle = "black";
 		ctx.fillRect(i*width,0,width,height*arr[i]);
 	}
 }
 
-let ind = 0,st = 0;
-let swapped = 1;
-function bubleSort(){
+function stop(){
 	clearInterval(intervalId);
-	ind = 0;
-	st = 0;
+}
+
+function reset(){
+	stop();
+}
+function bubleSort(){
+	reset();
+	var ind = 1;
 	intervalId = setInterval(function(){
+		draw(arr);	
 		if(arrayIsSorted(arr)){
-			clearInterval(intervalId);
-			draw(arr);
+			stop();
 		}
 		if(ind==arr.length-1){
 			ind = 0;
 		}
-		draw(arr);		
-		let size = arr.length;
-		let width = WIDTH/size;
-		let	height = HEIGHT/size;
 		
-		ctx.fillStyle = "yellow";
-		ctx.fillRect(ind*width,0,width,height*arr[ind]);
-		ctx.fillRect((ind+1)*width,0,width,height*arr[ind+1]);
-		
+		fillNthElement(ind,"purple");
+		fillNthElement(ind+1,"red");
 		
 		if(arr[ind]>arr[ind+1]){
 			swap(arr,ind,ind+1);
 		}
 		
 		ind++;
-		
 	}, TICK_RATE);
+}
+
+function selectionSort(){
+	reset();
+	var ind = 0;
+	var minIndex = 0;
+	var st = 0;
+	intervalId = setInterval(function(){
+		draw(arr);
+		if(arr[minIndex]>arr[ind]){
+			minIndex = ind;
+		}
+		if(ind == arr.length-1){
+			swap(arr,minIndex,st);
+			st++;
+			ind = st;
+			minIndex = st;
+		}
+		if(st==arr.length-1){
+			draw(arr);stop();
+		}
+		
+		
+		fillNthElement(minIndex,"blue");
+		fillNthElement(st,"red");
+		fillNthElement(ind);
+		ind++;
+	},TICK_RATE);
+}
+
+function doubleSelectionSort(){
+	reset();
+	var ind = 0;
+	var minIndex = 0;
+	var maxIndex = 0;
+	intervalId = setInterval(function(){
+		draw(arr);
+		if(arr[minIndex]>arr[ind]){
+			minIndex = ind;
+		}
+		if(arr[maxIndex]<arr[ind]){
+			maxIndex = ind;
+		}
+		
+		if(ind >= arr.length-1-st){
+			swap(arr,minIndex,st);
+			swap(arr,maxIndex,arr.length-1-st);
+			st++;
+			ind = st;
+			minIndex = st;
+			maxIndex = arr.length-1-st;
+		}
+
+		if(st>=arr.length-1-st){
+			draw(arr);stop();
+		}
+		
+		fillNthElement(st,"red");
+		fillNthElement(arr.length-1-st,"red");
+		fillNthElement(ind);
+
+		fillNthElement(maxIndex,"orange");
+		fillNthElement(minIndex,"blue");
+
+		ind++;
+	},TICK_RATE);
+	
+}
+
+function fillNthElement(n,color = "yellow"){
+	let size = arr.length;
+	let width = WIDTH/size;
+	let	height = HEIGHT/size;
+		
+	ctx.fillStyle = color;
+	ctx.fillRect(n*width,0,width,height*arr[n]);
 }
 
 function swap(arr,i,j){
@@ -109,15 +213,29 @@ function arrayIsSorted(arr){
 	return true;
 }
 
+function doc_keyUp(e) {
+	if (e.keyCode == 'A'.charCodeAt(0)) 
+		document.getElementById('arrSize').focus();
+	if (e.keyCode == 'G'.charCodeAt(0)) 
+		generate();
+    if (e.keyCode == 'B'.charCodeAt(0)) 
+		bubleSort();
+	if (e.keyCode == 'S'.charCodeAt(0)) 
+		selectionSort();
+	if (e.keyCode == 'D'.charCodeAt(0)) 
+		doubleSelectionSort();
 
-generate();
+}
+document.addEventListener('keyup', doc_keyUp, false);
 
 document.getElementById('generate').onclick = generate;
 document.getElementById('bubbleSort').onclick = bubleSort;
+document.getElementById('selectionSort').onclick = selectionSort;
+document.getElementById('doubleSelectionSort').onclick = doubleSelectionSort;
 
+document.getElementById('fast').onclick = ()=>{TICK_RATE = 10};
+document.getElementById('medium').onclick = ()=>{TICK_RATE = 200};
+document.getElementById('slow').onclick = ()=>{TICK_RATE = 1000};
 
-
-
-
-
+generate();
 
