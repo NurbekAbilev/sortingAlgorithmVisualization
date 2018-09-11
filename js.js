@@ -1,35 +1,3 @@
-/*function sort(a){
-	let minIndex = 0;
-    let maxIndex = 0;
-    let st = 0;
-    let ind = 0;
-	for(st = 0;st<a.length-1-st;st++){
-		for(let i=st;i<a.length-1-st;i++){
-			if(a[i]>a[minIndex]){
-				minIndex = st;
-			}
-			if(a[i]<a[maxIndex]){
-				maxIndex = st;
-			}
-		}
-		let temp = a[maxIndex];
-		a[maxIndex] = a[st];
-		a[st] = temp;
-
-		let d = a.length-1-st;
-		temp = a[minIndex];
-		a[minIndex] = a[d];
-		a[d] = temp;
-	}
-	return a;
-}
-
-let a = sort([1,2,3,1,3,6,1,5,9,6,3]);
-console.log(a);
-
-*/
-
-
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -38,6 +6,7 @@ const HEIGHT = canvas.height;
 const MIN_SIZE = 10;
 const MAX_SIZE = 100;
 const DEFAULT_COLOR = "black";
+const MAX_VALUE = 500;
 
 let ind = 0,st = 0;
 
@@ -62,6 +31,8 @@ function createRandomArray(size){
 		lastIndex--;
 	}	
 	return arr;
+
+	// return [3,1,2,10,11,12,7,8,9,4,5,6,13,14,15];
 }
 
 function generate(){
@@ -141,8 +112,7 @@ function selectionSort(){
 		if(st==arr.length-1){
 			draw(arr);stop();
 		}
-		
-		
+				
 		fillNthElement(minIndex,"blue");
 		fillNthElement(st,"red");
 		fillNthElement(ind);
@@ -150,43 +120,139 @@ function selectionSort(){
 	},TICK_RATE);
 }
 
-function doubleSelectionSort(){
+function insertionSort(){
 	reset();
 	var ind = 0;
-	var minIndex = 0;
-	var maxIndex = 0;
+	var st = 0;
 	intervalId = setInterval(function(){
 		draw(arr);
-		if(arr[minIndex]>arr[ind]){
-			minIndex = ind;
-		}
-		if(arr[maxIndex]<arr[ind]){
-			maxIndex = ind;
-		}
-		
-		if(ind >= arr.length-1-st){
-			swap(arr,minIndex,st);
-			swap(arr,maxIndex,arr.length-1-st);
+		fillNthElement(ind);
+		fillNthElement(st,"red");
+		if(ind==0 || arr[ind]>=arr[ind-1]){
 			st++;
 			ind = st;
-			minIndex = st;
-			maxIndex = arr.length-1-st;
+			return;
 		}
+		if(st==arr.length){
+			stop();
+			return;
+		}
+		swap(arr,ind,ind-1);
+		ind--;
+	},TICK_RATE);
+}
 
-		if(st>=arr.length-1-st){
-			draw(arr);stop();
+function heapSort(){
+	reset();
+	var colors = [
+		"Maroon","Red","Orange",
+		"Yellow","Olive","Green",
+		"Purple","Teal","Lime",
+		"Blue","Aqua","Navy"
+	];
+
+	function drawHeap(){
+		let powerOfTwo = 1;
+		let color = 0,ind = 0;
+		for(let i=0;i<arr.length;i++){
+			fillNthElement(i,colors[color]);
+			ind++;
+			if(ind==powerOfTwo){
+				color++;
+				powerOfTwo*=2;
+				ind = 0;
+			}
+		}
+	}
+
+	let n = arr.length-1;
+	var st = arr.length-1;
+	var ind = st;
+
+	intervalId = setInterval(function createHeap(){
+		draw(arr);
+		drawHeap();
+		fillNthElement(ind,"black");
+		let max = ind;
+		let r = 2*ind+1;
+		let l = 2*ind+2;
+		if(l<n && arr[l]>arr[max]){
+			max = l;
+		}
+		if(r<n && arr[r]>arr[max]){
+			max = r;
+		}
+		if(arr[max] == arr[ind]){
+			st--;
+			ind = st;
+			if(st<0){
+				stop();
+				// TICK_RATE = 500;
+				intervalId = setInterval(sortFromHeap,TICK_RATE)
+			}
+			return; 
+		}
+		if(max==l){
+			swap(arr,ind,l);
+			ind = l;
+		}
+		if(max==r){
+			swap(arr,ind,r);
+			ind = r;
+		}
+	},TICK_RATE);
+
+	var last = arr.length-1;
+	var i = last;
+
+	function drawHeap2(){
+		let powerOfTwo = 1;
+		let color = 0,ind = 0;
+		for(let i=0;i<last;i++){
+			fillNthElement(i,colors[color]);
+			ind++;
+			if(ind==powerOfTwo){
+				color++;
+				powerOfTwo*=2;
+				ind = 0;
+			}
+		}
+	}
+
+	function sortFromHeap(){
+		draw(arr);
+		drawHeap2();
+		fillNthElement(i);
+		if(last<=0){
+			stop();
+			return;
+		}
+		let max = i;
+		let r = 2*i+1;
+		let l = 2*i+2;
+		if(l<=last && arr[l]>arr[max]){
+			max = l;
+		}
+		if(r<=last && arr[r]>arr[max]){
+			max = r;
+		}
+		if(i>=last || arr[max]==arr[i]){
+			swap(arr,0,last);
+			last--;
+			i = 0;
+			return;
+		}
+		if(max==l){
+			swap(arr,i,l);
+			i = l;
+		}
+		if(max==r){
+			swap(arr,i,r);
+			i = r;
 		}
 		
-		fillNthElement(st,"red");
-		fillNthElement(arr.length-1-st,"red");
-		fillNthElement(ind);
 
-		fillNthElement(maxIndex,"orange");
-		fillNthElement(minIndex,"blue");
-
-		ind++;
-	},TICK_RATE);
-	
+	}
 }
 
 function fillNthElement(n,color = "yellow"){
@@ -222,8 +288,10 @@ function doc_keyUp(e) {
 		bubleSort();
 	if (e.keyCode == 'S'.charCodeAt(0)) 
 		selectionSort();
-	if (e.keyCode == 'D'.charCodeAt(0)) 
-		doubleSelectionSort();
+	if (e.keyCode == 'I'.charCodeAt(0)) 
+		insertionSort();
+	if (e.keyCode == 'H'.charCodeAt(0)) 
+		heapSort();
 
 }
 document.addEventListener('keyup', doc_keyUp, false);
@@ -231,11 +299,11 @@ document.addEventListener('keyup', doc_keyUp, false);
 document.getElementById('generate').onclick = generate;
 document.getElementById('bubbleSort').onclick = bubleSort;
 document.getElementById('selectionSort').onclick = selectionSort;
-document.getElementById('doubleSelectionSort').onclick = doubleSelectionSort;
+document.getElementById('insertionSort').onclick = insertionSort;
+
 
 document.getElementById('fast').onclick = ()=>{TICK_RATE = 10};
 document.getElementById('medium').onclick = ()=>{TICK_RATE = 200};
 document.getElementById('slow').onclick = ()=>{TICK_RATE = 1000};
 
 generate();
-
