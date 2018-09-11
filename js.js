@@ -300,6 +300,8 @@ document.getElementById('generate').onclick = generate;
 document.getElementById('bubbleSort').onclick = bubleSort;
 document.getElementById('selectionSort').onclick = selectionSort;
 document.getElementById('insertionSort').onclick = insertionSort;
+document.getElementById('heapSort').onclick = heapSort;
+
 
 
 document.getElementById('fast').onclick = ()=>{TICK_RATE = 10};
