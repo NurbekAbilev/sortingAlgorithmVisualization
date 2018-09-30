@@ -1,3 +1,83 @@
+
+// function create(size){
+// 	let arr = [];
+// 	for(let i=0;i<size;i++){
+// 		arr.push(i+1);
+// 	}
+	
+// 	let lastIndex = arr.length - 1;
+	
+// 	while(lastIndex > 0){
+// 		let ind = Math.floor(Math.random()*lastIndex);
+// 		let temp = arr[lastIndex];
+// 		arr[lastIndex] = arr[ind];
+// 		arr[ind] = temp;
+// 		lastIndex--;
+// 	}	
+// 	return arr;
+// }
+
+// function printStack(arr){
+// 	for(let item of arr){
+// 		console.log(item);
+// 	}
+// 	console.log("===");
+// }
+// let arr = create(10);
+// console.log(arr);
+// sort(arr);
+
+// function sort(arr){
+// 	let stack = [[0,arr.length-1]];
+// 	while(stack.length>0){
+// 		printStack(stack);
+// 		console.log(arr);
+// 		let pair = stack.shift();
+// 		let low = pair[0];
+// 		let high = pair[1];
+// 		let pivot = arr[high];
+// 		let i = low;
+// 		for(let j=low;j<high;j++){
+// 			if(pivot>=arr[j]){
+// 				swap(arr,j,i);				
+// 				i++;				
+// 			}
+// 		}
+// 		swap(arr,i,high);
+// 		console.log(i,low);
+// 		if(i-1-low>=1){
+// 			stack.push([low,i-1]);
+// 		}
+// 		if(high-(i+1)>=1){
+// 			stack.push([i+1,high]);
+// 		}
+// 	}
+
+// }
+
+// let i = low-1;
+// 		for(let j=low;j<high;j++){
+// 			if(pivot>=arr[j]){
+// 				i++;				
+// 				swap(arr,j,i);
+// 			}
+// 		}
+// 		swap(arr,i+1,high);
+// 		console.log(i,low);
+// 		if(i-low>=1){
+// 			stack.push([low,i]);
+// 		}
+// 		if(high-(i+2)>=1){
+// 			stack.push([i+2,high]);
+// 		}
+
+
+// function swap(arr,i,j){
+// 	let temp = arr[i];
+// 	arr[i] = arr[j];
+// 	arr[j] = temp;
+// }
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -31,8 +111,6 @@ function createRandomArray(size){
 		lastIndex--;
 	}	
 	return arr;
-
-	// return [3,1,2,10,11,12,7,8,9,4,5,6,13,14,15];
 }
 
 function generate(){
@@ -250,9 +328,84 @@ function heapSort(){
 			swap(arr,i,r);
 			i = r;
 		}
-		
-
 	}
+}
+
+function quickSort(){
+	var i = 0;
+	var j = 0;
+	var stack = [[0,arr.length-1]];
+	var state = 0;
+	var nextState = function(){
+		state = (state+1)%3
+	}
+	var pair,low,high,pivot,i,j;
+
+
+	intervalId = setInterval(function(){
+		draw(arr);
+		fillNthElement(low,"red");
+		fillNthElement(high,"red");
+
+		fillNthElement(i);
+		fillNthElement(j,"brown");
+
+
+		if(state==0){
+			if(stack.length==0){
+				clearInterval(intervalId);
+				draw(arr);
+				return;
+			}
+			pair = stack.shift();
+			low = pair[0];
+			high = pair[1];
+			pivot = arr[high];
+			i = low;
+
+			j = low;
+
+			nextState();
+		}
+		else if(state==1){
+			if(j>=high){
+				nextState();
+				return;
+			}
+			if(pivot>=arr[j]){
+				swap(arr,j,i);				
+				i++;				
+			}
+			j++;	
+		}
+		else{
+			swap(arr,i,high);
+			if(i-1-low>=1){
+				stack.push([low,i-1]);
+			}
+			if(high-(i+1)>=1){
+				stack.push([i+1,high]);
+			}
+			nextState();
+		}
+
+
+		
+		// for(let j=low;j<high;j++){
+			
+		// }
+		// swap(arr,i,high);
+		// console.log(i,low);
+		// if(i-1-low>=1){
+		// 	stack.push([low,i-1]);
+		// }
+		// if(high-(i+1)>=1){
+		// 	stack.push([i+1,high]);
+		// }
+
+		// j++;
+
+	},TICK_RATE);
 }
 
 function fillNthElement(n,color = "yellow"){
@@ -292,6 +445,8 @@ function doc_keyUp(e) {
 		insertionSort();
 	if (e.keyCode == 'H'.charCodeAt(0)) 
 		heapSort();
+	if (e.keyCode == 'Q'.charCodeAt(0)) 
+		quickSort();
 
 }
 document.addEventListener('keyup', doc_keyUp, false);
@@ -301,6 +456,7 @@ document.getElementById('bubbleSort').onclick = bubleSort;
 document.getElementById('selectionSort').onclick = selectionSort;
 document.getElementById('insertionSort').onclick = insertionSort;
 document.getElementById('heapSort').onclick = heapSort;
+document.getElementById('quickSort').onclick = quickSort;
 
 
 
